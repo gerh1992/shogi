@@ -1,54 +1,51 @@
 from clases.jugador import Jugador
 from clases.piezas import *
-from termcolor import *
-import colorama
-
-colorama.init()
 
 
 class Tablero:
-    def __init__(self, jugador1, jugador2):
+    def __init__(self, negras, blancas):
         self.tablero = [
-            [Lancero(jugador1), Caballo(jugador1), General_plateado(jugador1), General_dorado(jugador1), Rey(jugador1),
-             General_dorado(jugador1), General_plateado(jugador1), Caballo(jugador1), Lancero(jugador1)],
-            ["--", Torre(jugador1), "--", "--", "--", "--", "--", Alfil(jugador1), "--"],
-            [Peon(jugador1), Peon(jugador1), Peon(jugador1), Peon(jugador1), Peon(jugador1), Peon(jugador1),
-             Peon(jugador1), Peon(jugador1), Peon(jugador1)],
-            ["--", "--", "--", "--", "--", "--", "--", "--", "--"],
-            ["--", "--", "--", "--", "--", "--", "--", "--", "--"],
-            ["--", "--", "--", "--", "--", "--", "--", "--", "--"],
-            [Peon(jugador2), Peon(jugador2), Peon(jugador2), Peon(jugador2), Peon(jugador2), Peon(jugador2),
-             Peon(jugador2), Peon(jugador2), Peon(jugador2)],
-            ["--", Alfil(jugador2), "--", "--", "--", "--", "--", Torre(jugador2), "--"],
-            [Lancero(jugador2), Caballo(jugador2), General_plateado(jugador2), General_dorado(jugador2), Rey(jugador2),
-             General_dorado(jugador2), General_plateado(jugador2), Caballo(jugador2), Lancero(jugador2)]]
-        self.diccionario = {"a": 0, "b": 1, "c": 2, "d": 3, "e": 4, "f": 5, "g": 6, "h": 7, "i": 8, 1: 8, 2: 7, 3: 6,
-                            4: 5, 5: 4, 6: 3, 7: 2, 8: 1, 9: 0}
+            [Lancero(negras), Caballo(negras), General_plateado(negras), General_dorado(negras), Rey(negras),
+             General_dorado(negras), General_plateado(negras), Caballo(negras), Lancero(negras)],
+            ["---", Torre(negras), "---", "---", "---", "---", "---", Alfil(negras), "---"],
+            [Peon(negras), Peon(negras), Peon(negras), Peon(negras), Peon(negras), Peon(negras),
+             Peon(negras), Peon(negras), Peon(negras)],
+            ["---", "---", "---", "---", "---", "---", "---", "---", "---"],
+            ["---", "---", "---", "---", "---", "---", "---", "---", "---"],
+            ["---", "---", "---", "---", "---", "---", "---", "---", "---"],
+            [Peon(blancas), Peon(blancas), Peon(blancas), Peon(blancas), Peon(blancas), Peon(blancas),
+             Peon(blancas), Peon(blancas), Peon(blancas)],
+            ["---", Alfil(blancas), "---", "---", "---", "---", "---", Torre(blancas), "---"],
+            [Lancero(blancas), Caballo(blancas), General_plateado(blancas), General_dorado(blancas), Rey(blancas),
+             General_dorado(blancas), General_plateado(blancas), Caballo(blancas), Lancero(blancas)]]
+
         self.turno = 0
-        self.jugador1 = jugador1
-        self.jugador2 = jugador2
+        self.negras = negras
+        self.blancas = blancas
+        self.rey_negras = [0, 4]
+        self.rey_blancas = [8, 4]
 
     def mostrar_tablero(self):
-
+        self.negras.mostrar_piezas_capturadas()
         for i in range(len(self.tablero)):
             for j in range(len(self.tablero[i])):
                 self.mostrar_pieza(i, j)
             print("")
 
-        print("   a    b    c    d    e    f    g    h    i")
+        print("   a     b     c     d     e     f     g     h     i")
+        self.blancas.mostrar_piezas_capturadas()
 
     def mostrar_pieza(self, i, j):
         if j == 0:
-            if self.tablero[i][j] == "--":
-                print(str(self.diccionario.get(i + 1) + 1) + "| " + self.tablero[i][j] + " | ", end="")
+            if self.es_vacio(i, j):
+                print(str(diccionario.get(i + 1) + 1) + "| " + self.tablero[i][j] + " | ", end="")
             else:
-                print(str(self.diccionario.get(i + 1) + 1) + "| " + colored(self.tablero[i][j].pieza, self.tablero[i][
-                    j].jugador.color_consola) + " | ", end="")
+                print(str(diccionario.get(i + 1) + 1) + "| " + self.tablero[i][j].pieza + " | ", end="")
         else:
-            if self.tablero[i][j] == "--":
+            if self.es_vacio(i, j):
                 print(self.tablero[i][j] + " | ", end="")
             else:
-                print(colored(self.tablero[i][j].pieza, self.tablero[i][j].jugador.color_consola) + " | ", end="")
+                print(self.tablero[i][j].pieza + " | ", end="")
 
     def checkear_limites(self, x_0, y_0, x_1, y_1):
         if (x_0 or y_0 or x_1 or y_1) < 0 or (x_0 or y_0 or x_1 or y_1) > 9:
@@ -57,66 +54,245 @@ class Tablero:
         else:
             return True
 
-    def checkear_pieza(self, x_0, y_0, x_1, y_1, jugador):
-        if self.tablero[x_0][y_0] == "--":
-            print("En esa casilla no hay ninguna ficha")
+    def checkear_pieza(self, i_0, j_0, i_1, j_1, jugador):
+        if self.es_vacio(i_0, j_0):
+            print("En esa casilla no hay ninguna ficha de las " + jugador.color)
+            return False
+        elif not self.es_vacio(i_1, j_1) and self.tablero[i_1][j_1].jugador.color == jugador.color:
+            print("No se pudo mover " + str(
+                self.tablero[i_0][j_0]) + " porque ya hay una ficha suya ocupando la casilla de destino")
             return False
         else:
-            if self.tablero[x_0][y_0].checkear_movimiento(x_0, y_0, x_1, y_1, jugador):
-                return True
+            if self.tablero[i_0][j_0].checkear_movimiento(i_0, j_0, i_1, j_1, jugador):
+                return self.checkear_camino(i_0, j_0, i_1, j_1)
             else:
                 return False
 
-
-    def checkear(self, x_0, y_0, x_1, y_1, jugador):
-
-        if self.checkear_limites(x_0, y_0, x_1, y_1) and self.checkear_pieza(x_0, y_0, x_1, y_1, jugador):
+    def checkear(self, i_0, j_0, i_1, j_1, jugador):
+        if self.checkear_limites(i_0, j_0, i_1, j_1) and self.checkear_pieza(i_0, j_0, i_1, j_1, jugador):
             return True
         else:
             return False
 
     def jugar(self):
-
         self.mostrar_tablero()
+
         if self.turno % 2 == 0:
-            self.realizar_turno(self.jugador2)
+            self.realizar_turno(self.blancas)
         else:
-            self.realizar_turno(self.jugador1)
+            self.realizar_turno(self.negras)
         self.turno += 1
 
     def realizar_turno(self, jugador):
-        print("Turno " + jugador.color + "!")
-        desde = self.pedir_coordenadas_arranque()
-        hasta = self.pedir_coordenadas_fin()
-
-        if not self.checkear(desde[0], desde[1], hasta[0], hasta[1], jugador):
-            self.realizar_turno(jugador)
+        if self.checkear_jaque(jugador):
+            mensaje_jaque(jugador)
+        mensaje_turno(jugador)
+        if consultar_resurrecion(jugador):
+            self.revivir_pieza(jugador)
         else:
-            self.tablero[hasta[0]][hasta[1]] = self.tablero[desde[0]][desde[1]]
-            self.tablero[desde[0]][desde[1]] = "--"
+            i_0, j_0 = pedir_coordenadas(0)
+            i_1, j_1 = pedir_coordenadas(1)
+
+            if not self.checkear(i_0, j_0, i_1, j_1, jugador):
+                self.realizar_turno(jugador)
+            else:
+                self.mover_pieza(jugador, i_0, j_0, i_1, j_1)
+
+    def mover_pieza(self, jugador, i_0, j_0, i_1, j_1):
+        if not self.es_vacio(i_1, j_1):
+            self.remover_pieza(jugador, i_1, j_1)
+        self.actualizar_tablero(jugador, i_0, j_0, i_1, j_1)
+
+    def remover_pieza(self, jugador, i, j):
+        if turno_blancas(jugador):
+            self.blancas.piezas_capturadas.append(self.tablero[i][j])
+        else:
+            self.negras.piezas_capturadas.append(self.tablero[i][j])
+
+    def actualizar_tablero(self, jugador, i_0, j_0, i_1, j_1):
+        self.tablero[i_1][j_1] = self.tablero[i_0][j_0]
+        self.tablero[i_0][j_0] = "---"
+        if self.tablero[i_1][j_1].__class__ is Rey:
+            self.actualizar_posicion_rey(jugador, i_1, j_1)
+        if self.checkear_promocion(i_0, i_1, self.tablero[i_1][j_1], jugador):
+            self.promover_pieza(i_1, j_1)
+
+    def actualizar_posicion_rey(self, jugador, i, j):
+        if turno_blancas(jugador):
+            self.rey_blancas = [i, j]
+        elif not turno_blancas(jugador):
+            self.rey_negras = [i, j]
 
     def checkear_ganador(self):
-        ##  Hacer!
+        if self.rey_negras in self.negras.piezas_capturadas:
+            mensaje_victoria(self.negras)
+            return True
+        elif self.rey_blancas in self.blancas.piezas_capturadas:
+            mensaje_victoria(self.blancas)
+            return True
+        else:
+            return False
+
+    def promover_pieza(self, i, j):
+        self.tablero[i][j] = self.tablero[i][j].promover()
+
+    def checkear_camino(self, i_0, j_0, i_1, j_1):
+        if self.tablero[i_0][j_0].__class__ == Caballo:
+            return True
+
+        while i_0 != i_1 or j_0 != j_1:
+            i_0 = acercar(i_0, i_1)
+            j_0 = acercar(j_0, j_1)
+            if i_0 == i_1 and j_0 == j_1:
+                break
+            elif not self.es_vacio(i_0, j_0):
+                print("No se puede realizar ese movimiento! Esta " + str(
+                    self.tablero[i_0][j_0]) + " bloqueando el camino!")
+                return False
+        return True
+
+    def revivir_pieza(self, jugador):
+        pieza = elegir_pieza(jugador)
+        jugador.piezas_capturadas.remove(pieza)
+        if pieza.__class__ in piezas_promocionadas:
+            pieza = pieza.involucionar(jugador)
+        else:
+            pieza.__init__(jugador)
+        while True:
+            i, j = pedir_coordenadas(0)
+            if self.son_coordenadas_validas_resurreccion(i, j, jugador, pieza.__class__):
+                self.tablero[i][j] = pieza
+                break
+            else:
+                print("Movimiento invalido! No se puede ubicar la pieza en esas coordenadas")
+
+    def checkear_promocion(self, x_0, x_1, pieza, jugador):
+        if esta_en_zona_promocionable(jugador, x_0, x_1) and pieza.__class__ in piezas_promocionables:
+            return preguntar_promocion(pieza, jugador)
+
+    def checkear_jaque(self, jugador):
+        if self.checkear_amenazas_horizontales(jugador):
+            return True
+        else:
+            return False
+
+    def checkear_amenazas_horizontales(self, jugador):
+        if turno_blancas(jugador):
+            izquierda = self.rey_blancas[1] - 1
+            derecha = self.rey_blancas[1] + 1
+            fila = self.rey_blancas[0]
+        else:
+            izquierda = self.rey_negras[1] - 1
+            derecha = self.rey_negras[1] + 1
+            fila = self.rey_negras[0]
+        while izquierda >= 0:
+            if not self.es_vacio(fila, izquierda) and self.tablero[fila][izquierda].jugador != jugador and \
+                    self.tablero[fila][izquierda].__class__ in amenazas_horizontales:
+                return True
+            elif not self.es_vacio(fila, izquierda) and self.tablero[fila][izquierda].jugador is jugador:
+                return False
+            izquierda -= 1
+        while derecha <= 8 and not self.es_vacio(fila, derecha):
+            if not self.es_vacio(fila, derecha) and self.tablero[fila][derecha].jugador != jugador and \
+                    self.tablero[fila][derecha].__class__ in amenazas_horizontales:
+                return True
+            derecha += 1
         return False
 
-    def pedir_coordenadas_arranque(self):
-        mov = input("Elegir ficha para realizar movimiento(Ej: D2 o d2)")
-        mov.replace(' ', '')
-        desde = [10, 10]
-        if (len(mov) != 2):
-            print("Coordenadas invalidas")
-        else:
-            mov = mov.lower()
-            desde = [self.diccionario.get(int(mov[1])), self.diccionario.get(mov[0])]
-        return desde
 
-    def pedir_coordenadas_fin(self):
-        mov = input("Elegir destino de la ficha(Ej: D2 o d2)")
-        mov.replace(' ', '')
-        hasta = [10, 10]
-        if (len(mov) != 2):
-            print("Coordenadas invalidas")
+    def es_vacio(self, i, j):
+        return True if self.tablero[i][j] == '---' else False
+
+    def son_coordenadas_validas_resurreccion(self, i, j, jugador, tipo_pieza):
+        if self.es_vacio(i, j) and tipo_pieza not in (Lancero, Peon, Caballo):
+            return True
+        elif self.es_vacio(i, j) and tipo_pieza in (Peon, Lancero) and turno_blancas(jugador) and i != 0:
+            return True
+        elif self.es_vacio(i, j) and tipo_pieza in (Peon, Lancero) and not turno_blancas(jugador) and i != 8:
+            return True
+        elif self.es_vacio(i, j) and tipo_pieza is Caballo and turno_blancas(jugador) and i >= 2:
+            return True
+        elif self.es_vacio(i, j) and tipo_pieza is Caballo and not turno_blancas(jugador) and i <= 6:
+            return True
         else:
-            mov = mov.lower()
-            hasta = [self.diccionario.get(int(mov[1])), self.diccionario.get(mov[0])]
-        return hasta
+            return False
+
+def mensaje_coordenadas_invalidas():
+    print("Coordenadas invalidas")
+
+def preguntar_promocion(pieza, jugador):
+    respuesta = input("Quiere promover " + str(pieza) + " de las " + jugador.color + " Y/N")
+    if respuesta.lower() == 'y':
+        return True
+    else:
+        return False
+
+def esta_en_zona_promocionable(jugador, x_0, x_1):
+    if turno_blancas(jugador):
+        return ((x_0 >= 0 and x_0 <= 2) or (x_1 >= 0 and x_1 <= 2))
+    elif not turno_blancas(jugador):
+        return ((x_0 <= 8 and x_0 >= 6) or (x_1 <= 8 and x_1 >= 6))
+    else:
+        return False
+
+def acercar(var_0, var_1):
+    if var_0 > var_1:
+        return var_0 - 1
+    elif var_0 < var_1:
+        return var_0 + 1
+    else:
+        return var_0
+
+diccionario = {"a": 0, "b": 1, "c": 2, "d": 3, "e": 4, "f": 5, "g": 6, "h": 7, "i": 8, 1: 8, 2: 7, 3: 6,
+                            4: 5, 5: 4, 6: 3, 7: 2, 8: 1, 9: 0}
+piezas_promocionadas = {Caballo_promocionado, Peon_promocionado, Torre_promocionada, Alfil_promocionado,
+                        General_plateado_promocionado, Lancero_promocionado}
+piezas_promocionables = {Caballo, Peon, Torre, Alfil, General_plateado, Lancero}
+amenazas_horizontales = {Torre, Torre_promocionada}
+amenazas_verticales = {Torre, Torre_promocionada}
+amenazas_diagonales = {Alfil, Alfil_promocionado}
+
+
+
+def pedir_coordenadas(codigo):
+    if codigo == 0:
+        mensaje = "Elegir coordenadas de la pieza(Ej: D2 o d2)"
+    else:
+        mensaje = "Elegir destino de la pieza(Ej: D2 o d2)"
+    mov = input(mensaje)
+    mov.replace(' ', '')
+    coordenadas = [10, 10]
+    if (len(mov) != 2) or mov.isdigit() or mov.isalpha():
+        mensaje_coordenadas_invalidas()
+    else:
+        mov = mov.lower()
+        coordenadas = [diccionario.get(int(mov[1])), diccionario.get(mov[0])]
+    return coordenadas
+
+def mensaje_jaque(jugador):
+    print("Las " + jugador.color + " estan en jaque!")
+
+def mensaje_turno(jugador):
+    print("Turno " + jugador.color + "!")
+
+def mensaje_victoria(jugador):
+    print("Las " + jugador.color + " han ganado la partida!!!")
+
+def consultar_resurrecion(jugador):
+    if len(jugador.piezas_capturadas) == 0:
+        return False
+    else:
+        respuesta = input("Quiere revivir una de las piezas que ha capturado?. Y/N")
+        return respuesta.lower() == "y"
+
+def elegir_pieza(jugador):
+    while True:
+        jugador.mostrar_piezas_capturadas_indexadas()
+        indice = input("Elija un numero del 1 al " + str(len(jugador.piezas_capturadas)) + " para revivir una de sus piezas")
+        if not indice.isdigit() or int(indice) > len(jugador.piezas_capturadas) or int(indice) < 1:
+            print("El indice elegido esta fuera de rango. Vuelva a elegir")
+        else:
+            return jugador.piezas_capturadas[int(indice) - 1]
+
+
+
