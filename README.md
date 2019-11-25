@@ -7,7 +7,7 @@ Implementado:
   - Reglas de los movimientos de todas las piezas
   - Resurreccion piezas
   - Promocion piezas
+  - Jaque
 
 Falta implementar:
-  - Jaque
   - Jaque Mate
