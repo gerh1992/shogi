@@ -386,12 +386,12 @@ class Peon_promocionado(Pieza):
         elif turno_blancas(jugador):
             if i_0 - i_1 == 1 and abs(j_0 - j_1) == 1:
                 return True
-            mensaje_movimiento_invalido(self)
+            if mensaje is True: mensaje_movimiento_invalido(self)
             return False
         elif not turno_blancas(jugador):
             if i_0 - i_1 == -1 and abs(j_0 - j_1) == 1:
                 return True
-            mensaje_movimiento_invalido(self)
+            if mensaje is True: mensaje_movimiento_invalido(self)
             return False
 
     def involucionar(self, jugador):
