@@ -63,7 +63,7 @@ class Tablero:
                 self.tablero[i_0][j_0]) + " porque ya hay una ficha suya ocupando la casilla de destino")
             return False
         else:
-            if self.tablero[i_0][j_0].checkear_movimiento(i_0, j_0, i_1, j_1, jugador):
+            if self.tablero[i_0][j_0].checkear_movimiento(i_0, j_0, i_1, j_1, jugador, True):
                 return self.checkear_camino(i_0, j_0, i_1, j_1)
             else:
                 return False
@@ -171,33 +171,155 @@ class Tablero:
             return preguntar_promocion(pieza, jugador)
 
     def checkear_jaque(self, jugador):
-        if self.checkear_amenazas_horizontales(jugador):
+        if self.buscar_amenazas(jugador):
             return True
         else:
             return False
 
-    def checkear_amenazas_horizontales(self, jugador):
-        if turno_blancas(jugador):
-            izquierda = self.rey_blancas[1] - 1
-            derecha = self.rey_blancas[1] + 1
-            fila = self.rey_blancas[0]
+    def buscar_amenazas(self, jugador):
+        rey = self.rey_blancas if turno_blancas(jugador) else self.rey_negras
+        enemigo = self.negras if turno_blancas(jugador) else self.blancas
+        if self.amenazas_horizontales(rey, enemigo, jugador) or self.amenazas_verticales(rey,enemigo, jugador) \
+                or self.amenazas_diagonal_1(rey, enemigo, jugador) or self.amenazas_diagonal_2(rey, enemigo, jugador)\
+                or self.amenazas_caballos(rey, enemigo, jugador):
+            return True
         else:
-            izquierda = self.rey_negras[1] - 1
-            derecha = self.rey_negras[1] + 1
-            fila = self.rey_negras[0]
-        while izquierda >= 0:
-            if not self.es_vacio(fila, izquierda) and self.tablero[fila][izquierda].jugador != jugador and \
-                    self.tablero[fila][izquierda].__class__ in amenazas_horizontales:
-                return True
-            elif not self.es_vacio(fila, izquierda) and self.tablero[fila][izquierda].jugador is jugador:
-                return False
-            izquierda -= 1
-        while derecha <= 8 and not self.es_vacio(fila, derecha):
-            if not self.es_vacio(fila, derecha) and self.tablero[fila][derecha].jugador != jugador and \
-                    self.tablero[fila][derecha].__class__ in amenazas_horizontales:
-                return True
-            derecha += 1
+            return False
+
+    def amenazas_horizontales(self, rey, enemigo, jugador):
+        i = rey[0]
+        j_1 = rey[1] + 1
+        j_2 = rey[1] - 1
+
+        # Revisar la derecha y dps la izquierda
+        while j_1 < 9:
+            if not self.es_vacio(i, j_1) and self.tablero[i][j_1].jugador is jugador:
+                break
+            elif not self.es_vacio(i, j_1):
+                if self.tablero[i][j_1].checkear_movimiento(i, j_1, rey[0], rey[1], enemigo, False):
+                    return True
+                else:
+                    break
+            j_1 += 1
+
+        while j_2 > -1:
+            if not self.es_vacio(i, j_2) and self.tablero[i][j_2].jugador is jugador:
+                break
+            elif not self.es_vacio(i, j_2):
+                if self.tablero[i][j_2].checkear_movimiento(i, j_2, rey[0], rey[1], enemigo, False):
+                    return True
+                else:
+                    break
+            j_2 -= 1
+
         return False
+
+    def amenazas_verticales(self, rey, enemigo, jugador):
+        i_1 = rey[0] + 1
+        i_2 = rey[0] - 1
+        j = rey[1]
+
+        while i_1 < 9:
+            if not self.es_vacio(i_1, j) and self.tablero[i_1][j].jugador is jugador:
+                break
+            elif not self.es_vacio(i_1, j):
+                if self.tablero[i_1][j].checkear_movimiento(i_1, j, rey[0], rey[1], enemigo, False):
+                    return True
+                else:
+                    break
+            i_1 += 1
+
+        while i_2 > -1:
+            if not self.es_vacio(i_2, j) and self.tablero[i_2][j].jugador is jugador:
+                break
+            elif not self.es_vacio(i_2, j):
+                if self.tablero[i_2][j].checkear_movimiento(i_2, j, rey[0], rey[1], enemigo, False):
+                    return True
+                else:
+                    break
+            i_2 -= 1
+
+        return False
+
+    def amenazas_diagonal_1(self, rey, enemigo, jugador):
+        i_1 = rey[0] + 1
+        i_2 = rey[0] - 1
+        j_1 = rey[1] + 1
+        j_2 = rey[1] - 1
+
+        while i_1 < 9 and j_1 < 9:
+            if not self.es_vacio(i_1, j_1) and self.tablero[i_1][j_1].jugador is jugador:
+                break
+            elif not self.es_vacio(i_1, j_1):
+                if self.tablero[i_1][j_1].checkear_movimiento(i_1, j_1, rey[0], rey[1], enemigo, False):
+                    return True
+                else:
+                    break
+            i_1 += 1
+            j_1 += 1
+
+        while (i_2 and j_2) > -1:
+            if not self.es_vacio(i_2, j_2) and self.tablero[i_2][j_2].jugador is jugador:
+                break
+            elif not self.es_vacio(i_2, j_2):
+                if self.tablero[i_2][j_2].checkear_movimiento(i_2, j_2, rey[0], rey[1], enemigo, False):
+                    return True
+                else:
+                    break
+            i_2 -= 1
+            j_2 -= 1
+        return False
+
+    def amenazas_diagonal_2(self, rey, enemigo, jugador):
+        i_1 = rey[0] + 1
+        i_2 = rey[0] - 1
+        j_1 = rey[1] - 1
+        j_2 = rey[1] + 1
+
+        while i_1 < 9 and j_1 > -1:
+
+            if not self.es_vacio(i_1, j_1) and self.tablero[i_1][j_1].jugador is jugador:
+                break
+            elif not self.es_vacio(i_1, j_1):
+                if self.tablero[i_1][j_1].checkear_movimiento(i_1, j_1, rey[0], rey[1], enemigo, False):
+                    return True
+                else:
+                    break
+            i_1 += 1
+            j_1 -= 1
+
+        while i_2 > -1 and j_2 < 9:
+            if not self.es_vacio(i_2, j_2) and self.tablero[i_2][j_2].jugador is jugador:
+                break
+            elif not self.es_vacio(i_2, j_2):
+                if self.tablero[i_2][j_2].checkear_movimiento(i_2, j_2, rey[0], rey[1], enemigo, False):
+                    return True
+                else:
+                    break
+            i_2 -= 1
+            j_2 += 1
+        return False
+
+    def amenazas_caballos(self, rey, enemigo, jugador):
+        i, j = rey
+        if jugador is self.blancas:
+            if i - 2 > -1 and j + 1 < 9 and j - 1 > -1:
+                if not self.es_vacio(i - 2, j + 1) and self.tablero[i - 2][j + 1].jugador is enemigo:
+                    if self.tablero[i - 2][j + 1].__class__ is Caballo:
+                        return True
+                elif not self.es_vacio(i - 2, j - 1) and self.tablero[i - 2][j - 1].jugador is enemigo:
+                    if self.tablero[i - 2][j - 1].__class__ is Caballo:
+                        return True
+            return False
+        else:
+            if i - 2 < 9 and j - 1 > -1 and j + 1 < 9:
+                if not self.es_vacio(i + 2, j + 1) and self.tablero[i + 2][j + 1].jugador is enemigo:
+                    if self.tablero[i + 2][j - 1].__class__ is Caballo:
+                        return True
+                elif not self.es_vacio(i + 2, j - 1) and self.tablero[i + 2][j - 1].jugador is enemigo:
+                    if self.tablero[i + 2][j - 1].__class__ is Caballo:
+                        return True
+            return False
 
 
     def es_vacio(self, i, j):
@@ -217,8 +339,10 @@ class Tablero:
         else:
             return False
 
+
 def mensaje_coordenadas_invalidas():
     print("Coordenadas invalidas")
+
 
 def preguntar_promocion(pieza, jugador):
     respuesta = input("Quiere promover " + str(pieza) + " de las " + jugador.color + " Y/N")
@@ -226,6 +350,7 @@ def preguntar_promocion(pieza, jugador):
         return True
     else:
         return False
+
 
 def esta_en_zona_promocionable(jugador, x_0, x_1):
     if turno_blancas(jugador):
@@ -235,6 +360,7 @@ def esta_en_zona_promocionable(jugador, x_0, x_1):
     else:
         return False
 
+
 def acercar(var_0, var_1):
     if var_0 > var_1:
         return var_0 - 1
@@ -243,15 +369,15 @@ def acercar(var_0, var_1):
     else:
         return var_0
 
+
 diccionario = {"a": 0, "b": 1, "c": 2, "d": 3, "e": 4, "f": 5, "g": 6, "h": 7, "i": 8, 1: 8, 2: 7, 3: 6,
-                            4: 5, 5: 4, 6: 3, 7: 2, 8: 1, 9: 0}
+               4: 5, 5: 4, 6: 3, 7: 2, 8: 1, 9: 0}
 piezas_promocionadas = {Caballo_promocionado, Peon_promocionado, Torre_promocionada, Alfil_promocionado,
                         General_plateado_promocionado, Lancero_promocionado}
 piezas_promocionables = {Caballo, Peon, Torre, Alfil, General_plateado, Lancero}
 amenazas_horizontales = {Torre, Torre_promocionada}
 amenazas_verticales = {Torre, Torre_promocionada}
 amenazas_diagonales = {Alfil, Alfil_promocionado}
-
 
 
 def pedir_coordenadas(codigo):
@@ -269,14 +395,18 @@ def pedir_coordenadas(codigo):
         coordenadas = [diccionario.get(int(mov[1])), diccionario.get(mov[0])]
     return coordenadas
 
+
 def mensaje_jaque(jugador):
     print("Las " + jugador.color + " estan en jaque!")
+
 
 def mensaje_turno(jugador):
     print("Turno " + jugador.color + "!")
 
+
 def mensaje_victoria(jugador):
     print("Las " + jugador.color + " han ganado la partida!!!")
+
 
 def consultar_resurrecion(jugador):
     if len(jugador.piezas_capturadas) == 0:
@@ -285,14 +415,13 @@ def consultar_resurrecion(jugador):
         respuesta = input("Quiere revivir una de las piezas que ha capturado?. Y/N")
         return respuesta.lower() == "y"
 
+
 def elegir_pieza(jugador):
     while True:
         jugador.mostrar_piezas_capturadas_indexadas()
-        indice = input("Elija un numero del 1 al " + str(len(jugador.piezas_capturadas)) + " para revivir una de sus piezas")
+        indice = input(
+            "Elija un numero del 1 al " + str(len(jugador.piezas_capturadas)) + " para revivir una de sus piezas")
         if not indice.isdigit() or int(indice) > len(jugador.piezas_capturadas) or int(indice) < 1:
             print("El indice elegido esta fuera de rango. Vuelva a elegir")
         else:
             return jugador.piezas_capturadas[int(indice) - 1]
-
-
-
