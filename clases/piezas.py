@@ -15,16 +15,16 @@ class Rey(Pieza):
     def __repr__(self):
         return "el rey"
 
-    def checkear_movimiento(self, i_0, j_0, i_1, j_1, jugador, codigo_mensaje):
+    def checkear_movimiento(self, i_0, j_0, i_1, j_1, jugador, mensaje):
         if self.jugador != jugador:
-            if codigo_mensaje is True: mensaje_pieza_rival(self)
+            if mensaje: mensaje_pieza_rival(self)
             return False
         elif (checkear_fila(i_0, i_1) and abs(j_0 - j_1) == 1) or (checkear_columna(j_0, j_1) and abs(i_0 - i_1) == 1):
             return True
         elif abs(i_0 - i_1) == 1 and abs(j_0 - j_1) == 1:
             return True
         else:
-            if codigo_mensaje is True: mensaje_movimiento_invalido(self)
+            if mensaje: mensaje_movimiento_invalido(self)
             return False
 
 
@@ -38,14 +38,14 @@ class Torre(Pieza):
     def __repr__(self):
         return "la torre"
 
-    def checkear_movimiento(self, i_0, j_0, i_1, j_1, jugador, codigo_mensaje):
+    def checkear_movimiento(self, i_0, j_0, i_1, j_1, jugador, mensaje):
         if self.jugador != jugador:
-            if codigo_mensaje is True: mensaje_pieza_rival(self)
+            if mensaje: mensaje_pieza_rival(self)
             return False
         elif (checkear_columna(j_0, j_1) and not checkear_fila(i_0, i_1)) or (not checkear_columna(j_0, j_1) and checkear_fila(i_0, i_1)):
             return True
         else:
-            if mensaje is True: mensaje_movimiento_invalido(self)
+            if mensaje: mensaje_movimiento_invalido(self)
             return False
 
     def promover(self):
@@ -63,14 +63,14 @@ class Torre_promocionada(Pieza):
 
     def checkear_movimiento(self, i_0, j_0, i_1, j_1, jugador, mensaje):
         if self.jugador != jugador:
-            if mensaje is True: mensaje_pieza_rival(self)
+            if mensaje: mensaje_pieza_rival(self)
             return False
         elif (checkear_columna(j_0, j_1) and not checkear_fila(i_0, i_1)) or (not checkear_columna(j_0, j_1) and checkear_fila(i_0, i_1)):
             return True
         elif abs(i_0 - i_1) == 1 and abs(j_0 - j_1) == 1:
             return True
         else:
-            if mensaje is True: mensaje_movimiento_invalido(self)
+            if mensaje: mensaje_movimiento_invalido(self)
             return False
 
     def involucionar(self, jugador):
@@ -88,12 +88,12 @@ class Alfil(Pieza):
 
     def checkear_movimiento(self, i_0, j_0, i_1, j_1, jugador, mensaje):
         if self.jugador != jugador:
-            if mensaje is True: mensaje_pieza_rival(self)
+            if mensaje: mensaje_pieza_rival(self)
             return False
         elif checkear_diag1(i_0, j_0, i_1, j_1) or checkear_diag2(i_0, j_0, i_1, j_1,):
             return True
         else:
-            if mensaje is True: mensaje_movimiento_invalido(self)
+            if mensaje: mensaje_movimiento_invalido(self)
             return False
 
     def promover(self):
@@ -111,14 +111,14 @@ class Alfil_promocionado(Pieza):
 
     def checkear_movimiento(self, i_0, j_0, i_1, j_1, jugador, mensaje):
         if self.jugador != jugador:
-            if mensaje is True: pieza_rival(self)
+            if mensaje: mensaje_pieza_rival(self)
             return False
         elif checkear_diag1(i_0, j_0, i_1, j_1) or checkear_diag2(i_0, j_0, i_1, j_1, ):
             return True
         elif (checkear_fila(i_0, i_1) and abs(j_0 - j_1) == 1) or (checkear_columna(j_0, j_1) and abs(i_0 - i_1) == 1):
             return True
         else:
-            if mensaje is True: mensaje_movimiento_invalido(self)
+            if mensaje: mensaje_movimiento_invalido(self)
             return False
 
     def involucionar(self, jugador):
@@ -136,19 +136,19 @@ class General_dorado(Pieza):
 
     def checkear_movimiento(self, i_0, j_0, i_1, j_1, jugador, mensaje):
         if self.jugador != jugador:
-            if mensaje is True: mensaje_pieza_rival(self)
+            if mensaje: mensaje_pieza_rival(self)
             return False
         elif (abs(i_0 - i_1) == 1 and j_0 == j_1) or (abs(j_0 - j_1) == 1 and i_0 == i_1):
             return True
         elif turno_blancas(jugador):
             if i_0 - i_1 == 1 and abs(j_0 - j_1) == 1:
                 return True
-            if mensaje is True: mensaje_movimiento_invalido(self)
+            if mensaje: mensaje_movimiento_invalido(self)
             return False
         elif not turno_blancas(jugador):
             if i_0 - i_1 == -1 and abs(j_0 - j_1) == 1:
                 return True
-            if mensaje is True: mensaje_movimiento_invalido(self)
+            if mensaje: mensaje_movimiento_invalido(self)
             return False
 
 class General_plateado(Pieza):
@@ -163,22 +163,22 @@ class General_plateado(Pieza):
 
     def checkear_movimiento(self, i_0, j_0, i_1, j_1, jugador, mensaje):
         if self.jugador != jugador:
-            if mensaje is True: mensaje_pieza_rival(self)
+            if mensaje: mensaje_pieza_rival(self)
             return False
         elif abs(i_0 - i_1) == 1 and abs(j_0 - j_1) == 1:
             return True
         elif turno_blancas(jugador):
             if i_0 - i_1 == 1:
                 return True
-            if mensaje is True: mensaje_movimiento_invalido(self)
+            if mensaje: mensaje_movimiento_invalido(self)
             return False
         elif not turno_blancas(jugador):
             if i_0 - i_1 == -1:
                 return True
-            if mensaje is True: mensaje_movimiento_invalido(self)
+            if mensaje: mensaje_movimiento_invalido(self)
             return False
         else:
-            if mensaje is True: mensaje_movimiento_invalido(self)
+            if mensaje: mensaje_movimiento_invalido(self)
             return False
 
         def promover(self):
@@ -196,19 +196,19 @@ class General_plateado_promocionado(Pieza):
 
     def checkear_movimiento(self, i_0, j_0, i_1, j_1, jugador, mensaje):
         if self.jugador != jugador:
-            if mensaje is True: mensaje_pieza_rival(self)
+            if mensaje: mensaje_pieza_rival(self)
             return False
         elif (abs(i_0 - i_1) == 1 and j_0 == j_1) or (abs(j_0 - j_1) == 1 and i_0 == i_1):
             return True
         elif turno_blancas(jugador):
             if i_0 - i_1 == 1 and abs(j_0 - j_1) == 1:
                 return True
-            if mensaje is True: mensaje_movimiento_invalido(self)
+            if mensaje: mensaje_movimiento_invalido(self)
             return False
         elif not turno_blancas(jugador):
             if i_0 - i_1 == -1 and abs(j_0 - j_1) == 1:
                 return True
-            if mensaje is True: mensaje_movimiento_invalido(self)
+            if mensaje: mensaje_movimiento_invalido(self)
             return False
 
     def involucionar(self, jugador):
@@ -226,19 +226,19 @@ class Caballo(Pieza):
 
     def checkear_movimiento(self, i_0, j_0, i_1, j_1, jugador, mensaje):
         if self.jugador != jugador:
-            if mensaje is True: mensaje_pieza_rival(self)
+            if mensaje: mensaje_pieza_rival(self)
             return False
         elif turno_blancas(jugador):
             if i_0 - i_1 == 2 and abs(j_0 - j_1) == 1:
                 return True
             else:
-                if mensaje is True: mensaje_movimiento_invalido(self)
+                if mensaje: mensaje_movimiento_invalido(self)
                 return False
         elif not turno_blancas(jugador):
             if i_0 - i_1 == -2 and abs(j_0 - j_1) == 1:
                 return True
             else:
-                if mensaje is True: mensaje_movimiento_invalido(self)
+                if mensaje: mensaje_movimiento_invalido(self)
                 return False
 
     def promover(self):
@@ -256,19 +256,19 @@ class Caballo_promocionado(Pieza):
 
     def checkear_movimiento(self, i_0, j_0, i_1, j_1, jugador, mensaje):
         if self.jugador != jugador:
-            if mensaje is True: mensaje_pieza_rival(self)
+            if mensaje: mensaje_pieza_rival(self)
             return False
         elif (abs(i_0 - i_1) == 1 and j_0 == j_1) or (abs(j_0 - j_1) == 1 and i_0 == i_1):
             return True
         elif turno_blancas(jugador):
             if i_0 - i_1 == 1 and abs(j_0 - j_1) == 1:
                 return True
-            if mensaje is True: mensaje_movimiento_invalido(self)
+            if mensaje: mensaje_movimiento_invalido(self)
             return False
         elif not turno_blancas(jugador):
             if i_0 - i_1 == -1 and abs(j_0 - j_1) == 1:
                 return True
-            if mensaje is True: mensaje_movimiento_invalido(self)
+            if mensaje: mensaje_movimiento_invalido(self)
             return False
 
     def involucionar(self, jugador):
@@ -286,20 +286,20 @@ class Lancero(Pieza):
 
     def checkear_movimiento(self, i_0, j_0, i_1, j_1, jugador, mensaje):
         if self.jugador != jugador:
-            if mensaje is True: mensaje_pieza_rival(self)
+            if mensaje: mensaje_pieza_rival(self)
             return False
         elif turno_blancas(jugador):
             if checkear_columna(j_0, j_1) and i_0 > i_1:
                 return True
-            if mensaje is True: mensaje_movimiento_invalido(self)
+            if mensaje: mensaje_movimiento_invalido(self)
             return False
         elif not turno_blancas(jugador):
             if checkear_columna(j_0, j_1) and i_0 < i_1:
                 return True
-            if mensaje is True: mensaje_movimiento_invalido(self)
+            if mensaje: mensaje_movimiento_invalido(self)
             return False
         else:
-            if mensaje is True: mensaje_movimiento_invalido(self)
+            if mensaje: mensaje_movimiento_invalido(self)
             return False
 
     def promover(self, jugador):
@@ -317,19 +317,19 @@ class Lancero_promocionado(Pieza):
 
     def checkear_movimiento(self, i_0, j_0, i_1, j_1, jugador, mensaje):
         if self.jugador != jugador:
-            if mensaje is True: mensaje_pieza_rival(self)
+            if mensaje: mensaje_pieza_rival(self)
             return False
         elif (abs(i_0 - i_1) == 1 and j_0 == j_1) or (abs(j_0 - j_1) == 1 and i_0 == i_1):
             return True
         elif turno_blancas(jugador):
             if i_0 - i_1 == 1 and abs(j_0 - j_1) == 1:
                 return True
-            if mensaje is True: mensaje_movimiento_invalido(self)
+            if mensaje: mensaje_movimiento_invalido(self)
             return False
         elif not turno_blancas(jugador):
             if i_0 - i_1 == -1 and abs(j_0 - j_1) == 1:
                 return True
-            if mensaje is True: mensaje_movimiento_invalido(self)
+            if mensaje: mensaje_movimiento_invalido(self)
             return False
 
     def involucionar(self, jugador):
@@ -348,19 +348,19 @@ class Peon(Pieza):
 
     def checkear_movimiento(self, i_0, j_0, i_1, j_1, jugador, mensaje):
         if self.jugador != jugador:
-            if mensaje == 0: mensaje_pieza_rival(self)
+            if mensaje: mensaje_pieza_rival(self)
             return False
         elif turno_blancas(jugador):
             if i_0 == (i_1 + 1) and j_0 == j_1:
                 return True
             else:
-                if mensaje is True: mensaje_movimiento_invalido(self)
+                if mensaje: mensaje_movimiento_invalido(self)
                 return False
         elif not turno_blancas(jugador):
             if i_0 == (i_1 - 1) and j_0 == j_1:
                 return True
             else:
-                if mensaje is True: mensaje_movimiento_invalido(self)
+                if mensaje: mensaje_movimiento_invalido(self)
                 return False
         return False
 
@@ -379,19 +379,19 @@ class Peon_promocionado(Pieza):
 
     def checkear_movimiento(self, i_0, j_0, i_1, j_1, jugador, mensaje):
         if self.jugador != jugador:
-            if mensaje is True: mensaje_pieza_rival(self)
+            if mensaje: mensaje_pieza_rival(self)
             return False
         elif (abs(i_0 - i_1) == 1 and j_0 == j_1) or (abs(j_0 - j_1) == 1 and i_0 == i_1):
             return True
         elif turno_blancas(jugador):
             if i_0 - i_1 == 1 and abs(j_0 - j_1) == 1:
                 return True
-            if mensaje is True: mensaje_movimiento_invalido(self)
+            if mensaje: mensaje_movimiento_invalido(self)
             return False
         elif not turno_blancas(jugador):
             if i_0 - i_1 == -1 and abs(j_0 - j_1) == 1:
                 return True
-            if mensaje is True: mensaje_movimiento_invalido(self)
+            if mensaje: mensaje_movimiento_invalido(self)
             return False
 
     def involucionar(self, jugador):
