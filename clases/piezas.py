@@ -1,7 +1,5 @@
 class Pieza():
 
-    piezas_capturadas = []
-
     def __init__(self, jugador):
         self.jugador = jugador
 
@@ -302,8 +300,8 @@ class Lancero(Pieza):
             if mensaje: mensaje_movimiento_invalido(self)
             return False
 
-    def promover(self, jugador):
-        return Lancero_promocionado(jugador)
+    def promover(self):
+        return Lancero_promocionado(self.jugador)
 
 class Lancero_promocionado(Pieza):
     simbolo = "+L"

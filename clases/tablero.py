@@ -1,4 +1,3 @@
-from clases.jugador import Jugador
 from clases.piezas import *
 
 
@@ -24,6 +23,13 @@ class Tablero:
         self.blancas = blancas
         self.rey_negras = [0, 4]
         self.rey_blancas = [8, 4]
+        self.historial_movimientos = []
+
+    def jugar(self):
+        self.mostrar_tablero()
+        jugador = self.blancas if self.turno % 2 == 0 else self.negras
+        self.realizar_turno(jugador)
+        self.turno += 1
 
     def mostrar_tablero(self):
         self.negras.mostrar_piezas_capturadas()
@@ -34,6 +40,31 @@ class Tablero:
 
         print("   a     b     c     d     e     f     g     h     i")
         self.blancas.mostrar_piezas_capturadas()
+
+    def realizar_turno(self, jugador):
+        if self.checkear_jaque(jugador):
+            mensaje_jaque(jugador)
+        mensaje_turno(jugador)
+        if consultar_resurrecion(jugador):
+            self.revivir_pieza(jugador)
+        else:
+            i_0, j_0 = pedir_coordenadas(0)
+            i_1, j_1 = pedir_coordenadas(1)
+
+            if not self.checkear(i_0, j_0, i_1, j_1, jugador):
+                self.realizar_turno(jugador)
+            else:
+                self.mover_pieza(jugador, i_0, j_0, i_1, j_1)
+
+    def checkear_ganador(self):
+        if self.tablero[self.rey_negras[0]][self.rey_negras[1]].__class__ != Rey:
+            mensaje_victoria(self.blancas)
+            return True
+        elif self.tablero[self.rey_blancas[0]][self.rey_blancas[1]].__class__ != Rey:
+            mensaje_victoria(self.negras)
+            return True
+        else:
+            return False
 
     def mostrar_pieza(self, i, j):
         if j == 0:
@@ -46,6 +77,12 @@ class Tablero:
                 print(self.tablero[i][j] + " | ", end="")
             else:
                 print(self.tablero[i][j].pieza + " | ", end="")
+
+    def checkear(self, i_0, j_0, i_1, j_1, jugador):
+        if self.checkear_limites(i_0, j_0, i_1, j_1) and self.checkear_pieza(i_0, j_0, i_1, j_1, jugador):
+            return True
+        else:
+            return False
 
     def checkear_limites(self, x_0, y_0, x_1, y_1):
         if (x_0 or y_0 or x_1 or y_1) < 0 or (x_0 or y_0 or x_1 or y_1) > 9:
@@ -68,40 +105,11 @@ class Tablero:
             else:
                 return False
 
-    def checkear(self, i_0, j_0, i_1, j_1, jugador):
-        if self.checkear_limites(i_0, j_0, i_1, j_1) and self.checkear_pieza(i_0, j_0, i_1, j_1, jugador):
-            return True
-        else:
-            return False
-
-    def jugar(self):
-        self.mostrar_tablero()
-
-        if self.turno % 2 == 0:
-            self.realizar_turno(self.blancas)
-        else:
-            self.realizar_turno(self.negras)
-        self.turno += 1
-
-    def realizar_turno(self, jugador):
-        if self.checkear_jaque(jugador):
-            mensaje_jaque(jugador)
-        mensaje_turno(jugador)
-        if consultar_resurrecion(jugador):
-            self.revivir_pieza(jugador)
-        else:
-            i_0, j_0 = pedir_coordenadas(0)
-            i_1, j_1 = pedir_coordenadas(1)
-
-            if not self.checkear(i_0, j_0, i_1, j_1, jugador):
-                self.realizar_turno(jugador)
-            else:
-                self.mover_pieza(jugador, i_0, j_0, i_1, j_1)
-
     def mover_pieza(self, jugador, i_0, j_0, i_1, j_1):
         if not self.es_vacio(i_1, j_1):
             self.remover_pieza(jugador, i_1, j_1)
         self.actualizar_tablero(jugador, i_0, j_0, i_1, j_1)
+        self.anotar_movimiento(jugador, i_0, j_0, i_1, j_1)
 
     def remover_pieza(self, jugador, i, j):
         if turno_blancas(jugador):
@@ -122,16 +130,6 @@ class Tablero:
             self.rey_blancas = [i, j]
         elif not turno_blancas(jugador):
             self.rey_negras = [i, j]
-
-    def checkear_ganador(self):
-        if self.rey_negras in self.negras.piezas_capturadas:
-            mensaje_victoria(self.negras)
-            return True
-        elif self.rey_blancas in self.blancas.piezas_capturadas:
-            mensaje_victoria(self.blancas)
-            return True
-        else:
-            return False
 
     def promover_pieza(self, i, j):
         self.tablero[i][j] = self.tablero[i][j].promover()
@@ -175,6 +173,11 @@ class Tablero:
             return True
         else:
             return False
+
+    def anotar_movimiento(self, jugador, i_0, j_0, i_1, j_1):
+        jug = "b" if turno_blancas(jugador) else "n"
+        movimiento = str(self.turno+1) + "" + jug + ": " + str(i_0) + "-" + str(j_0) + ", " + str(i_1) + "-" + str(j_1)
+        self.historial_movimientos.append(movimiento)
 
     def buscar_amenazas(self, jugador):
         rey = self.rey_blancas if turno_blancas(jugador) else self.rey_negras
@@ -346,10 +349,13 @@ def mensaje_coordenadas_invalidas():
 
 def preguntar_promocion(pieza, jugador):
     respuesta = input("Quiere promover " + str(pieza) + " de las " + jugador.color + " Y/N")
-    if respuesta.lower() == 'y':
+    if respuesta.lower() == "y":
         return True
-    else:
+    elif respuesta.lower() == "n":
         return False
+    else:
+        print("La respuesta solo puede ser 'y' para si o 'n' para no")
+        return preguntar_promocion(pieza, jugador)
 
 
 def esta_en_zona_promocionable(jugador, x_0, x_1):
@@ -387,13 +393,18 @@ def pedir_coordenadas(codigo):
         mensaje = "Elegir destino de la pieza(Ej: D2 o d2)"
     mov = input(mensaje)
     mov.replace(' ', '')
-    coordenadas = [10, 10]
-    if (len(mov) != 2) or mov.isdigit() or mov.isalpha():
+    if len(mov) != 2 or mov.isdigit() or mov.isalpha():
         mensaje_coordenadas_invalidas()
+        return pedir_coordenadas(codigo)
     else:
         mov = mov.lower()
-        coordenadas = [diccionario.get(int(mov[1])), diccionario.get(mov[0])]
-    return coordenadas
+        if mov[0] in diccionario.keys() and mov[1].isdigit() and int(mov[1]) in diccionario.keys():
+            coordenadas = [diccionario.get(int(mov[1])), diccionario.get(mov[0])]
+            return coordenadas
+        else:
+            mensaje_coordenadas_invalidas()
+    return pedir_coordenadas(codigo)
+
 
 
 def mensaje_jaque(jugador):
@@ -413,7 +424,13 @@ def consultar_resurrecion(jugador):
         return False
     else:
         respuesta = input("Quiere revivir una de las piezas que ha capturado?. Y/N")
-        return respuesta.lower() == "y"
+        if respuesta.lower() == "y":
+            return True
+        elif respuesta.lower() == "n":
+            return False
+        else:
+            print("La respuesta solo puede ser 'y' para si o 'n' para no")
+            return consultar_resurrecion(jugador)
 
 
 def elegir_pieza(jugador):

@@ -1,5 +1,3 @@
-from .piezas import *
-
 class Jugador:
 
     def __init__(self, color):
